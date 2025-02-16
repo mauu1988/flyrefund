@@ -8,13 +8,13 @@
         body {
             font-family: Arial, sans-serif;
             background-color: white;
-            color: #00274d; /* Colore blu scuro per il testo */
+            color: #00274d;
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: #00509e; /* Colore blu per l'header */
+            background-color: #00509e;
             color: white;
             padding: 20px;
             text-align: center;
@@ -24,33 +24,54 @@
 
         .container {
             padding: 20px;
+            max-width: 800px;
+            margin: auto;
         }
 
         .filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 20px;
+        }
+
+        .filters label {
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .filters input, .filters select, .filters button {
             padding: 10px;
             font-size: 16px;
-            margin-right: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #00509e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #003f7f;
         }
 
         ul {
-            list-style-type: disc;
-            padding-left: 20px;
+            list-style-type: none;
+            padding: 0;
         }
 
         li {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .flight-info {
             background-color: #f0f8ff;
             border: 1px solid #00509e;
             padding: 10px;
             border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -88,47 +109,31 @@
     </div>
 
     <script>
-        let allFlights = [];
-
-        // Funzione per recuperare i voli dal server con i filtri selezionati
         async function fetchAndDisplayFlights(airportCode, fromDate, toDate) {
             try {
                 const response = await fetch(`http://localhost:8081/retrieveFlights?airportCode=${airportCode}&fromDate=${fromDate}&toDate=${toDate}`);
-                
                 if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+                    throw new Error('Errore nel recupero dati');
                 }
-
                 const flights = await response.json();
-                allFlights = flights; // Salviamo tutti i voli in una variabile globale
                 displayFlights(flights);
             } catch (error) {
-                console.error('Fetch error:', error);
-                const flightList = document.getElementById('flight-list');
-                flightList.innerHTML = '<li>Errore nel recupero dei dati. Riprova più tardi.</li>';
+                document.getElementById('flight-list').innerHTML = '<li>Errore nel recupero dei dati. Riprova più tardi.</li>';
             }
         }
 
         function displayFlights(flights) {
             const flightList = document.getElementById('flight-list');
-            flightList.innerHTML = ''; // Puliamo l'elenco precedente
-
-            if (flights.length === 0) {
-                flightList.innerHTML = '<li>Nessun volo trovato.</li>';
-                return;
-            }
-
+            flightList.innerHTML = flights.length ? '' : '<li>Nessun volo trovato.</li>';
             flights.forEach(flight => {
                 const listItem = document.createElement('li');
-                listItem.classList.add('flight-info');
                 listItem.innerHTML = `
                     <strong>Volo:</strong> ${flight.volo} <br>
                     <strong>Partenza:</strong> ${flight.partenza} <br>
                     <strong>Arrivo:</strong> ${flight.arrivo} <br>
                     <strong>Ritardo Arrivo:</strong> ${flight.ritardo_arrivo} <br>
                     <strong>Orario previsto:</strong> ${flight.scheduled_in} <br>
-                    <strong>Orario partenza:</strong> ${flight.scheduled_out}
-                `;
+                    <strong>Orario partenza:</strong> ${flight.scheduled_out}`;
                 flightList.appendChild(listItem);
             });
         }
@@ -137,22 +142,18 @@
             const airportCode = document.getElementById('airport-select').value;
             const fromDate = document.getElementById('from-date').value;
             const toDate = document.getElementById('to-date').value;
-
             if (!fromDate || !toDate) {
                 alert("Inserisci entrambe le date.");
                 return;
             }
-
-            // Effettua una nuova richiesta con i filtri selezionati
             fetchAndDisplayFlights(airportCode, fromDate, toDate);
         }
 
-        // Funzione per resettare i filtri e ripristinare la lista completa dei voli
         function resetFilters() {
-            document.getElementById('airport-select').selectedIndex = 0; // Reset selezione aeroporto
-            document.getElementById('from-date').value = ''; // Pulisce la data "Da"
-            document.getElementById('to-date').value = ''; // Pulisce la data "A"
-            document.getElementById('flight-list').innerHTML = ''; // Pulisce l'elenco dei voli
+            document.getElementById('airport-select').selectedIndex = 0;
+            document.getElementById('from-date').value = '';
+            document.getElementById('to-date').value = '';
+            document.getElementById('flight-list').innerHTML = '';
         }
     </script>
 

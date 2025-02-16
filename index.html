@@ -111,7 +111,7 @@
     <script>
         async function fetchAndDisplayFlights(airportCode, fromDate, toDate) {
             try {
-                const response = await fetch(`http://localhost:8081/retrieveFlights?airportCode=${airportCode}&fromDate=${fromDate}&toDate=${toDate}`);
+                const response = await fetch(`https://flyrefund-backend.onrender.com/retrieveFlights?airportCode=${airportCode}&fromDate=${fromDate}&toDate=${toDate}`);
                 if (!response.ok) {
                     throw new Error('Errore nel recupero dati');
                 }
